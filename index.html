@@ -1,182 +1,118 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stok Sampul Produksi SAI</title>
-
-<style>
+/* ====================
+   HALAMAN UTAMA
+==================== */
 body{
-margin:0;
-padding:20px;
-font-family:Arial,sans-serif;
-background:#f4f8ff;
+font-family:Arial,Helvetica,sans-serif;
+background:#f3f6fb;
+padding:16px;
+color:#1f2937; /* Warna teks default */
 }
 
+/* ====================
+   CONTAINER UTAMA
+==================== */
 .wrap{
-max-width:420px;
+max-width:430px;
 margin:auto;
 }
 
+/* ====================
+   KARTU UTAMA
+==================== */
+.card{
+background:#fff;
+border-radius:18px;
+padding:18px;
+box-shadow:0 4px 14px rgba(0,0,0,.06);
+}
+
+/* ====================
+   JUDUL WEBSITE
+==================== */
 .title{
-font-size:28px;
-font-weight:bold;
+font-size:26px;
+font-weight:700;
 text-align:center;
-color:#1565c0;
+color:#1565c0; /* Warna judul */
+margin-bottom:14px;
+}
+
+/* ====================
+   BOX TANGGAL UPDATE
+==================== */
+.updateBox{
+padding:12px;
+border-radius:14px;
+text-align:center;
+font-size:15px;
+font-weight:700;
+margin-bottom:16px;
+background:#e5e7eb;
+}
+
+/* ====================
+   LABEL INPUT
+==================== */
+.label{
+font-size:14px;
+font-weight:700;
+margin-bottom:8px;
+}
+
+/* ====================
+   INPUT PRODUK
+==================== */
+input{
+width:100%;
+height:52px;
+padding:0 14px;
+font-size:17px;
+border:1px solid #d1d5db;
+border-radius:14px;
+outline:none;
 margin-bottom:12px;
 }
 
-.updateBox{
-padding:10px;
-border-radius:12px;
-text-align:center;
-font-size:16px;
-font-weight:bold;
-margin-bottom:18px;
-color:#000;
+/* Saat input dipilih */
+input:focus{
+border-color:#1976d2;
 }
 
-input{
+/* ====================
+   TOMBOL SEARCH / MASUK
+==================== */
+button{
 width:100%;
-padding:14px;
-font-size:18px;
-border-radius:10px;
-border:1px solid #ccc;
-box-sizing:border-box;
-margin-bottom:18px;
+height:52px;
+border:none;
+border-radius:14px;
+background:#1976d2; /* Warna tombol */
+color:#fff;         /* Warna tulisan */
+font-size:17px;
+font-weight:700;
+margin-bottom:16px;
+cursor:pointer;
 }
 
+/* Efek saat tombol ditekan */
+button:active{
+transform:scale(.99);
+}
+
+/* ====================
+   BOX QUANTITY
+==================== */
 .qty{
-background:#1976d2;
-color:#fff;
-font-size:46px;
-font-weight:bold;
-text-align:center;
-padding:28px;
-border-radius:15px;
-}
-
-.popup{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.5);
+min-height:110px;
+border-radius:16px;
+background:#1976d2; /* Warna box qty */
 display:flex;
 justify-content:center;
 align-items:center;
+text-align:center;
+padding:16px;
+font-size:42px;
+font-weight:700;
+color:#fff; /* Warna angka qty */
+word-break:break-word;
 }
-
-.popupBox{
-background:#fff;
-padding:20px;
-border-radius:15px;
-width:85%;
-max-width:340px;
-}
-
-button{
-width:100%;
-padding:12px;
-font-size:18px;
-background:#1976d2;
-color:#fff;
-border:none;
-border-radius:10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="wrap">
-
-<div class="title">Stok Sampul Produksi SAI</div>
-
-<div id="updateBox" class="updateBox">Loading...</div>
-
-<input list="products" id="produk" placeholder="Cari Produk..." onchange="cekProduk()" onclick="this.value=''" onfocus="this.value=''">
-<datalist id="products"></datalist>
-
-<div class="qty" id="qty">0</div>
-
-</div>
-
-<div class="popup" id="popup">
-<div class="popupBox">
-<h3>Masukkan Nama Anda</h3>
-<input type="text" id="nama">
-<button onclick="saveNama()">Masuk</button>
-</div>
-</div>
-
-<script>
-const API = "https://script.google.com/macros/s/AKfycby1LxwwpHdD5LI4qufHQ-CNQX5LbkuxSTvrCB00s9QdvEJUlwxrwkZrZd9iUcdkZvM7/exec";
-
-let username = localStorage.getItem("username") || "";
-
-if(username){
- document.getElementById("popup").style.display="none";
-}
-
-function saveNama(){
- let n = document.getElementById("nama").value.trim();
- if(!n) return;
-
- localStorage.setItem("username", n);
- username = n;
-
- document.getElementById("popup").style.display="none";
-}
-
-async function loadProducts(){
- let res = await fetch(API + "?action=getProducts");
- let data = await res.json();
-
- let list = document.getElementById("products");
- list.innerHTML = "";
-
- data.forEach(x=>{
-   let op = document.createElement("option");
-   op.value = x.nama;
-   list.appendChild(op);
- });
-}
-
-async function loadUpdateDate(){
- let res = await fetch(API + "?action=getUpdateDate");
- let data = await res.json();
-
- let box = document.getElementById("updateBox");
-
- box.innerText = "Update: " + data.date;
-
- if(data.status === "green"){
-   box.style.background = "#82ff46";
- }else{
-   box.style.background = "#ff4646";
- }
-}
-
-async function cekProduk(){
-
- let produk = document.getElementById("produk").value;
- let device = navigator.userAgent;
-
- document.getElementById("qty").innerText = "Tunggu Sebentar...";
-
- let url = API +
- "?action=search" +
- "&product=" + encodeURIComponent(produk) +
- "&user=" + encodeURIComponent(username) +
- "&device=" + encodeURIComponent(device);
-
- let res = await fetch(url);
- let data = await res.json();
-
- document.getElementById("qty").innerText = data.qty;
-}
-
-loadProducts();
-loadUpdateDate();
-</script>
-
-</body>
-</html>
